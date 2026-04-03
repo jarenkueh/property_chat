@@ -126,7 +126,7 @@ def get_response(user_query: str, db: SQLDatabase, chat_history: list):
 
     Classification:""")
 
-    classification = llm(classify_prompt.format_messages(query=user_query)).content.strip()
+    classification = llm.invoke(classify_prompt.format_messages(query=user_query)).content.strip()
 
     if classification == "GENERAL":
         general_response_prompt = ChatPromptTemplate.from_template("""
@@ -137,7 +137,7 @@ def get_response(user_query: str, db: SQLDatabase, chat_history: list):
         Question: {question}
 
         Response:""")
-        return llm(general_response_prompt.format_messages(question=user_query)).content
+        return llm.invoke(general_response_prompt.format_messages(question=user_query)).content
     else:
         try:
             sql_chain = get_sql_chain(db)
