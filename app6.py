@@ -10,10 +10,10 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_groq import ChatGroq
 
 def get_db_url():
-    return (
-        st.secrets.get("SUPABASE_DB_URL")
-        or os.environ.get("SUPABASE_DB_URL")
-    )
+    try:
+        return st.secrets.get("SUPABASE_DB_URL") or os.environ.get("SUPABASE_DB_URL")
+    except Exception:
+        return os.environ.get("SUPABASE_DB_URL")
 
 @st.cache_resource
 def init_db():
@@ -264,8 +264,11 @@ def chat_with_data(db):
         st.session_state.chat_history.append(AIMessage(content=response))
 
 def main():
-    if "GROQ_API_KEY" in st.secrets:
-        os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
+    try:
+        if "GROQ_API_KEY" in st.secrets:
+            os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
+    except Exception:
+        pass
 
     engine, db = init_db()
     if engine is None:
